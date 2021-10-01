@@ -1,0 +1,5 @@
+# Ligacoes emergencias Plantao
+*/1 * * * * /bin/sh /home/programas/scripts/zabbix_call.sh
+
+# Ligacoes emergencias Gerente
+*/1 * * * * /bin/sh /home/programas/scripts/gerente_call.sh
