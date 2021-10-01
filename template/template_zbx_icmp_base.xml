@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-09-06T12:47:02Z</date>
+    <groups>
+        <group>
+            <name>ICMP</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>ICMP Base</template>
+            <name>ICMP Base</name>
+            <description>Template base para monitoramento ICMP, possui macros que definem os parâmetros base para demais templates aninhados ICMP.</description>
+            <groups>
+                <group>
+                    <name>ICMP</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>ICMP</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Perda de pacotes</name>
+                    <type>SIMPLE</type>
+                    <key>icmppingloss[,{$ICMP_PACOTES},{$ICMP_INTERVALO},{$ICMP_SIZE},{$ICMP_TIMEOUT}]</key>
+                    <delay>3m</delay>
+                    <trends>1825d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>ICMP</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{avg(#5)}&gt;{$ICMP_PERDAS_MAX}</expression>
+                            <name>{HOST.NAME} Está com perda excessiva de pacotes</name>
+                            <dependencies>
+                                <dependency>
+                                    <name>{HOST.NAME} não responde a Ping</name>
+                                    <expression>{ICMP Base:icmpping[,{$ICMP_PACOTES},{$ICMP_INTERVALO},{$ICMP_SIZE},{$ICMP_TIMEOUT}].sum(#2)}=0</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Latência</name>
+                    <type>SIMPLE</type>
+                    <key>icmppingsec[,{$ICMP_PACOTES},{$ICMP_INTERVALO},{$ICMP_SIZE},{$ICMP_TIMEOUT},]</key>
+                    <delay>3m</delay>
+                    <trends>1825d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>s</units>
+                    <applications>
+                        <application>
+                            <name>ICMP</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{avg(#5)}&gt;{$ICMP_LATENCIA_MAX}</expression>
+                            <name>{HOST.NAME} Está com latência alta</name>
+                            <dependencies>
+                                <dependency>
+                                    <name>{HOST.NAME} não responde a Ping</name>
+                                    <expression>{ICMP Base:icmpping[,{$ICMP_PACOTES},{$ICMP_INTERVALO},{$ICMP_SIZE},{$ICMP_TIMEOUT}].sum(#2)}=0</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Ping</name>
+                    <type>SIMPLE</type>
+                    <key>icmpping[,{$ICMP_PACOTES},{$ICMP_INTERVALO},{$ICMP_SIZE},{$ICMP_TIMEOUT}]</key>
+                    <delay>3m</delay>
+                    <trends>1825d</trends>
+                    <applications>
+                        <application>
+                            <name>ICMP</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>BOOL_TO_DECIMAL</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{sum(#2)}=0</expression>
+                            <name>{HOST.NAME} não responde a Ping</name>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+            <macros>
+                <macro>
+                    <macro>{$ICMP_INTERVALO}</macro>
+                    <value>1000</value>
+                </macro>
+                <macro>
+                    <macro>{$ICMP_LATENCIA_MAX}</macro>
+                    <value>150</value>
+                </macro>
+                <macro>
+                    <macro>{$ICMP_PACOTES}</macro>
+                    <value>5</value>
+                </macro>
+                <macro>
+                    <macro>{$ICMP_PERDAS_MAX}</macro>
+                    <value>45</value>
+                </macro>
+                <macro>
+                    <macro>{$ICMP_SIZE}</macro>
+                    <value>32</value>
+                </macro>
+                <macro>
+                    <macro>{$ICMP_TIMEOUT}</macro>
+                    <value>500</value>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+    <graphs>
+        <graph>
+            <name># Latência</name>
+            <graph_items>
+                <graph_item>
+                    <drawtype>GRADIENT_LINE</drawtype>
+                    <color>1A7C11</color>
+                    <yaxisside>RIGHT</yaxisside>
+                    <calc_fnc>MAX</calc_fnc>
+                    <item>
+                        <host>ICMP Base</host>
+                        <key>icmppingsec[,{$ICMP_PACOTES},{$ICMP_INTERVALO},{$ICMP_SIZE},{$ICMP_TIMEOUT},]</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>#Latência X Perdas</name>
+            <graph_items>
+                <graph_item>
+                    <color>199C0D</color>
+                    <yaxisside>RIGHT</yaxisside>
+                    <item>
+                        <host>ICMP Base</host>
+                        <key>icmppingsec[,{$ICMP_PACOTES},{$ICMP_INTERVALO},{$ICMP_SIZE},{$ICMP_TIMEOUT},]</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>FF0000</color>
+                    <item>
+                        <host>ICMP Base</host>
+                        <key>icmppingloss[,{$ICMP_PACOTES},{$ICMP_INTERVALO},{$ICMP_SIZE},{$ICMP_TIMEOUT}]</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name># Perdas de Pacote</name>
+            <graph_items>
+                <graph_item>
+                    <drawtype>FILLED_REGION</drawtype>
+                    <color>DD0000</color>
+                    <item>
+                        <host>ICMP Base</host>
+                        <key>icmppingloss[,{$ICMP_PACOTES},{$ICMP_INTERVALO},{$ICMP_SIZE},{$ICMP_TIMEOUT}]</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name># Ping</name>
+            <graph_items>
+                <graph_item>
+                    <drawtype>BOLD_LINE</drawtype>
+                    <color>1A7C11</color>
+                    <calc_fnc>MAX</calc_fnc>
+                    <item>
+                        <host>ICMP Base</host>
+                        <key>icmpping[,{$ICMP_PACOTES},{$ICMP_INTERVALO},{$ICMP_SIZE},{$ICMP_TIMEOUT}]</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+    </graphs>
+</zabbix_export>

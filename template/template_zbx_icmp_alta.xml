@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-09-06T12:51:09Z</date>
+    <groups>
+        <group>
+            <name>ICMP</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>ICMP Alta</template>
+            <name>ICMP Alta</name>
+            <description>Template para monitoramento ICMP, possui macros que definem os parâmetros específicos para equipamentos considerados nível Alto.</description>
+            <templates>
+                <template>
+                    <name>ICMP Base</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>ICMP</name>
+                </group>
+            </groups>
+            <macros>
+                <macro>
+                    <macro>{$ICMP_INTERVALO}</macro>
+                    <value>500</value>
+                </macro>
+                <macro>
+                    <macro>{$ICMP_LATENCIA_MAX}</macro>
+                    <value>50</value>
+                </macro>
+                <macro>
+                    <macro>{$ICMP_PACOTES}</macro>
+                    <value>3</value>
+                </macro>
+                <macro>
+                    <macro>{$ICMP_PERDAS_MAX}</macro>
+                    <value>40</value>
+                </macro>
+                <macro>
+                    <macro>{$ICMP_TIMEOUT}</macro>
+                    <value>250</value>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+</zabbix_export>
